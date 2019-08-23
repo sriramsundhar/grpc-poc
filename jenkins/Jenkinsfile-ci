@@ -30,12 +30,12 @@ node('alpine') {
   
   }
   stage('Release') {
-    git(
-      url: scm.getUserRemoteConfigs()[0].getUrl(),
-      branch: config.TRUNK_NAME,
-      credentialsId: config.SSH_KEY_ID
-    )
     if(jenkinsUtils.isReleasable(config)) {
+      git(
+              url: scm.getUserRemoteConfigs()[0].getUrl(),
+              branch: config.TRUNK_NAME,
+              credentialsId: config.SSH_KEY_ID
+      )
       // Release lifecycle
       rtGradle.deployer server: server, repo: 'libs-release-local'
       rtGradle.run rootDir: ".", buildFile: 'build.gradle', tasks: 'release -Prelease.useAutomaticVersion=true', buildInfo: buildInfo

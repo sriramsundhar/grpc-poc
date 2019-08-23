@@ -5,7 +5,9 @@ import net.researchgate.release.GitAdapter
 plugins {
     java
     idea
+    id("maven-publish")
     id("com.google.protobuf") version "0.8.8"
+    id ("com.jfrog.artifactory") version "4.8.1"
     id("net.researchgate.release") version "2.8.0"
     `java-library`
 }
@@ -44,9 +46,26 @@ protobuf {
         }
     }
 }
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            artifact(tasks["sourcesJar"])
+            artifact(tasks["javadocJar"])
+        }
+    }
+}
+
 release {
     failOnSnapshotDependencies = true
     with (propertyMissing("git") as GitAdapter.GitConfig) {
         requireBranch = "master"
     }
 }
+
+tasks {
+    "afterReleaseBuild" {
+        dependsOn(getTasksByName("artifactoryPublish", true))
+    }
+}
+

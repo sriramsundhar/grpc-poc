@@ -30,7 +30,8 @@ node('alpine') {
   
   }
   stage('Release') {
-    if(jenkinsUtils.isReleasable(config)) {
+    if(true) {
+    //if(jenkinsUtils.isReleasable(config)) {
       git(
               url: scm.getUserRemoteConfigs()[0].getUrl(),
               branch: config.TRUNK_NAME,

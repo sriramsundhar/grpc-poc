@@ -1,5 +1,6 @@
 import com.google.protobuf.gradle.*
 import org.gradle.kotlin.dsl.provider.gradleKotlinDslOf
+import net.researchgate.release.GitAdapter
 
 plugins {
     java
@@ -41,5 +42,11 @@ protobuf {
                 id("grpc")
             }
         }
+    }
+}
+release {
+    failOnSnapshotDependencies = true
+    with (propertyMissing("git") as GitAdapter.GitConfig) {
+        requireBranch = "master"
     }
 }

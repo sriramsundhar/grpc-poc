@@ -1,29 +1,27 @@
 import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 
-// assuming an agent is configured as alpine
+// assuming an agent is configured as alpinei
+
+def server = Artifactory.server 'jfrog'
+def rtGradle = Artifactory.newGradleBuild()
+rtGradle.resolver repo:'jcenter', server: server
+rtGradle.useWrapper = true
+rtGradle.usesPlugin = true
+rtGradle.deployer.deployArtifacts = true
+rtGradle.deployer.deployMavenDescriptors = true
+rtGradle.deployer.mavenCompatible = true
+def buildInfo = Artifactory.newBuildInfo()
+
 node('alpine') {
   checkout scm
   def jenkinsUtils = load "./jenkins/Utils.groovy"
   def config = jenkinsUtils.getConfig()
   config.initialCommitHash = jenkinsUtils.getCommitHash()
   stage('Build') {
-
-  }
-  stage('Test') {
-    println("StageName: $STAGE_NAME")
-    withCredentials([[
-      $class: "AmazonWebServicesCredentialsBinding",
-      credentialsId: "aws-role"
-    ]]) {
-      sh(script: './jenkins/validate-cfn')
-    }
-
-  }
-  stage('Code Analysis') {
-    println("Sonar, Detek etc.")
+    sh(script: './gradle clean build')
   }
   stage('Create snapshot artifact') {
-  
+
   }
   stage('Deploy snapshot') {
   
@@ -39,6 +37,8 @@ node('alpine') {
     )
     if(jenkinsUtils.isReleasable(config)) {
       // Release lifecycle
+      rtGradle.deployer server: server, repo: 'libs-release-local'
+      rtGradle.run rootDir: ".", buildFile: 'build.gradle', tasks: 'release -Prelease.useAutomaticVersion=true', buildInfo: buildInfo
     } else {
       Utils.markStageSkippedForConditional("$STAGE_NAME")
     }

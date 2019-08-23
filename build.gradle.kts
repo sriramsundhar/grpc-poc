@@ -49,10 +49,7 @@ protobuf {
 
 publishing {
     publications {
-        create<MavenPublication>("mavenJava") {
-            artifact(tasks["sourcesJar"])
-            artifact(tasks["javadocJar"])
-        }
+        create<MavenPublication>("mavenJava") {}
     }
 }
 

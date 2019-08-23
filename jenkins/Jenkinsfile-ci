@@ -39,7 +39,7 @@ node('alpine') {
       )
       // Release lifecycle
       rtGradle.deployer server: server, repo: 'libs-release-local'
-      rtGradle.run rootDir: ".", buildFile: 'build.gradle', tasks: 'release -Prelease.useAutomaticVersion=true', buildInfo: buildInfo
+      rtGradle.run rootDir: ".", buildFile: 'build.gradle.kts', tasks: 'release -Prelease.useAutomaticVersion=true', buildInfo: buildInfo
     } else {
       Utils.markStageSkippedForConditional("$STAGE_NAME")
     }
